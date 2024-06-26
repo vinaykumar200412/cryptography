@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <ctype.h>
+
+// Function to encrypt text using Caesar Cipher
+void caesarCipher(char text[], int k) {
+    char ch;
+    for(int i = 0; text[i] != '\0'; ++i) {
+        ch = text[i];
+
+        // Encrypt uppercase characters
+        if(isupper(ch)) {
+            ch = (ch - 'A' + k) % 26 + 'A';
+        }
+        // Encrypt lowercase characters
+        else if(islower(ch)) {
+            ch = (ch - 'a' + k) % 26 + 'a';
+        }
+
+        text[i] = ch;
+    }
+}
+
+int main() {
+    char text[100];
+    int k;
+
+    // Input text from user
+    printf("Enter a string: ");
+    fgets(text, sizeof(text), stdin);
+
+    // Input shift value k
+    printf("Enter shift value (1-25): ");
+    scanf("%d", &k);
+
+    // Check for valid shift value
+    if(k < 1 || k > 25) {
+        printf("Invalid shift value! Please enter a value between 1 and 25.\n");
+        return 1;
+    }
+
+    // Encrypt the text
+    caesarCipher(text, k);
+
+    // Output the encrypted text
+    printf("Encrypted text: %s\n", text);
+
+    return 0;
+}
