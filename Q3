@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Define the 5x5 Playfair matrix
+char playfairMatrix[5][5];
+
+// Function to prepare the Playfair matrix
+void prepareMatrix(char key[]) {
+    int alphabet[26] = {0};
+    int x = 0, y = 0;
+
+    // Create matrix with key characters
+    for (int i = 0; key[i] != '\0'; ++i) {
+        if (!alphabet[key[i] - 'A']) {
+            playfairMatrix[x][y++] = key[i];
+            alphabet[key[i] - 'A'] = 1;
+            if (y == 5) {
+                y = 0;
+                x++;
+            }
+        }
+    }
+
+    // Add remaining letters
+    for (char c = 'A'; c <= 'Z'; ++c) {
+        if (c == 'J') continue; // Skip 'J'
+        if (!alphabet[c - 'A']) {
+            playfairMatrix[x][y++] = c;
+            if (y == 5) {
+                y = 0;
+                x++;
+            }
+        }
+    }
+}
+
+// Function to encrypt using Playfair cipher
+void playfairEncrypt(char text[], char key[]) {
+    prepareMatrix(key);
+    int len = strlen(text);
+    for (int i = 0; i < len; i += 2) {
+        char a = text[i];
+        char b = (i + 1 < len) ? text[i + 1] : 'X';
+
+        if (a == b) b = 'X'; // Handle repeated letters
+
+        int x1, y1, x2, y2;
+        for (int r = 0; r < 5; ++r) {
+            for (int c = 0; c < 5; ++c) {
+                if (playfairMatrix[r][c] == a) {
+                    x1 = r;
+                    y1 = c;
+                }
+                if (playfairMatrix[r][c] == b) {
+                    x2 = r;
+                    y2 = c;
+                }
+            }
+        }
+
+        if (x1 == x2) {
+            text[i] = playfairMatrix[x1][(y1 + 1) % 5];
+            text[i + 1] = playfairMatrix[x2][(y2 + 1) % 5];
+        } else if (y1 == y2) {
+            text[i] = playfairMatrix[(x1 + 1) % 5][y1];
+            text[i + 1] = playfairMatrix[(x2 + 1) % 5][y2];
+        } else {
+            text[i] = playfairMatrix[x1][y2];
+            text[i + 1] = playfairMatrix[x2][y1];
+        }
+    }
+}
+
+int main() {
+    char text[100] = "HELLO"; // Example text
+    char key[] = "MONARCHY"; // Example key
+
+    playfairEncrypt(text, key);
+    printf("Encrypted text: %s\n", text);
+    return 0;
+}
