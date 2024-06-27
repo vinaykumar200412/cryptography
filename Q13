@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MODULO 26
+
+// Function to find the modular inverse of a number modulo 26
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+// Function to compute the determinant of a 2x2 matrix
+int determinant(int matrix[2][2]) {
+    return (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) % MODULO;
+}
+
+// Function to find the inverse of a 2x2 matrix modulo 26
+void matrixInverse(int matrix[2][2], int inverse[2][2]) {
+    int det = determinant(matrix);
+    int det_inv = modInverse(det, MODULO);
+
+    if (det_inv == -1) {
+        printf("No modular inverse for determinant %d\n", det);
+        exit(1);
+    }
+
+    inverse[0][0] = ( matrix[1][1] * det_inv) % MODULO;
+    inverse[0][1] = (-matrix[0][1] * det_inv) % MODULO;
+    inverse[1][0] = (-matrix[1][0] * det_inv) % MODULO;
+    inverse[1][1] = ( matrix[0][0] * det_inv) % MODULO;
+
+    // Ensure all entries are positive
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            if (inverse[i][j] < 0)
+                inverse[i][j] += MODULO;
+}
+
+// Function to multiply two 2x2 matrices modulo 26
+void matrixMultiply(int a[2][2], int b[2][2], int result[2][2]) {
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            result[i][j] = 0;
+            for (int k = 0; k < 2; k++) {
+                result[i][j] += a[i][k] * b[k][j];
+            }
+            result[i][j] %= MODULO;
+        }
+    }
+}
+
+// Function to break Hill cipher using chosen plaintext attack
+void breakHillCipher(int plaintext[2][2], int ciphertext[2][2], int key[2][2]) {
+    int plaintext_inv[2][2];
+    matrixInverse(plaintext, plaintext_inv);
+    matrixMultiply(plaintext_inv, ciphertext, key);
+}
+
+int main() {
+    // Example plaintext-ciphertext pairs
+    // Plaintext pairs: "he" -> "li", "ll" -> "ox"
+    int plaintext[2][2] = {
+        {7, 4}, // "he" -> (7, 4)
+        {11, 11} // "ll" -> (11, 11)
+    };
+    int ciphertext[2][2] = {
+        {11, 8}, // "li" -> (11, 8)
+        {14, 23} // "ox" -> (14, 23)
+    };
+    int key[2][2];
+
+    breakHillCipher(plaintext, ciphertext, key);
+
+    printf("Recovered key matrix:\n");
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            printf("%d ", key[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
