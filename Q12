@@ -1,0 +1,49 @@
+include <stdio.h>
+#include <string.h>
+
+#define MATRIX_SIZE 2
+
+void encrypt(char *plaintext, int key[MATRIX_SIZE][MATRIX_SIZE], char *ciphertext) {
+    int i, j, k;
+    int len = strlen(plaintext);
+    int block[MATRIX_SIZE];
+    int result[MATRIX_SIZE];
+
+    for (i = 0; i < len; i += MATRIX_SIZE) {
+        // Initialize result block
+        for (j = 0; j < MATRIX_SIZE; j++) {
+            result[j] = 0;
+            block[j] = plaintext[i + j] - 'a';
+        }
+
+        // Perform matrix multiplication and mod 26 operation
+        for (j = 0; j < MATRIX_SIZE; j++) {
+            for (k = 0; k < MATRIX_SIZE; k++) {
+                result[j] += key[j][k] * block[k];
+            }
+            result[j] %= 26;
+        }
+
+        // Convert result to ciphertext
+        for (j = 0; j < MATRIX_SIZE; j++) {
+            ciphertext[i + j] = result[j] + 'a';
+        }
+    }
+
+    ciphertext[len] = '\0';
+}
+
+int main() {
+    char plaintext[] = "meetmeattheusualplaceattenratherthaneightoclock";
+    int key[MATRIX_SIZE][MATRIX_SIZE] = {
+        {9, 4},
+        {5, 7}
+    };
+    char ciphertext[100];
+
+    encrypt(plaintext, key, ciphertext);
+
+    printf("Ciphertext: %s\n", ciphertext);
+
+    return 0;
+}
