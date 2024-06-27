@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to generate a random key
+void generateRandomKey(int key[], int length) {
+    srand(time(0)); // Seed the random number generator
+    for (int i = 0; i < length; i++) {
+        key[i] = rand() % ALPHABET_SIZE; // Random number between 0 and 25
+    }
+}
+
+// Function to encrypt the plaintext
+void encrypt(char *plaintext, int key[], char *ciphertext) {
+    int length = strlen(plaintext);
+    for (int i = 0; i < length; i++) {
+        if (plaintext[i] >= 'a' && plaintext[i] <= 'z') {
+            // Shift letter by the key value
+            ciphertext[i] = ((plaintext[i] - 'a' + key[i]) % ALPHABET_SIZE) + 'a';
+        } else if (plaintext[i] >= 'A' && plaintext[i] <= 'Z') {
+            // Support for uppercase letters
+            ciphertext[i] = ((plaintext[i] - 'A' + key[i]) % ALPHABET_SIZE) + 'A';
+        } else {
+            ciphertext[i] = plaintext[i]; // Non-alphabetic characters are unchanged
+        }
+    }
+    ciphertext[length] = '\0'; // Null-terminate the ciphertext string
+}
+
+// Function to decrypt the ciphertext
+void decrypt(char *ciphertext, int key[], char *plaintext) {
+    int length = strlen(ciphertext);
+    for (int i = 0; i < length; i++) {
+        if (ciphertext[i] >= 'a' && ciphertext[i] <= 'z') {
+            // Reverse the shift by the key value
+            plaintext[i] = ((ciphertext[i] - 'a' - key[i] + ALPHABET_SIZE) % ALPHABET_SIZE) + 'a';
+        } else if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            // Support for uppercase letters
+            plaintext[i] = ((ciphertext[i] - 'A' - key[i] + ALPHABET_SIZE) % ALPHABET_SIZE) + 'A';
+        } else {
+            plaintext[i] = ciphertext[i]; // Non-alphabetic characters are unchanged
+        }
+    }
+    plaintext[length] = '\0'; // Null-terminate the plaintext string
+}
+
+int main() {
+    char plaintext[256];
+    printf("Enter the plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0'; // Remove the newline character
+
+    int length = strlen(plaintext);
+    int key[length];
+    char ciphertext[length + 1];
+    char decryptedtext[length + 1];
+
+    generateRandomKey(key, length);
+
+    // Print the generated key
+    printf("Generated key: ");
+    for (int i = 0; i < length; i++) {
+        printf("%d ", key[i]);
+    }
+    printf("\n");
+
+    encrypt(plaintext, key, ciphertext);
+    printf("Ciphertext: %s\n", ciphertext);
+
+    decrypt(ciphertext, key, decryptedtext);
+    printf("Decrypted text: %s\n", decryptedtext);
+
+    return 0;
+}
