@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Function to calculate the modular inverse of a under modulo m
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1)
+            return x;
+    }
+    return -1;  // No modular inverse found
+}
+
+// Function to decrypt using the affine cipher formula
+void affineDecrypt(char* ciphertext, int a, int b) {
+    int a_inv = modInverse(a, 26);
+    if (a_inv == -1) {
+        printf("Decryption not possible, no modular inverse found for a = %d\n", a);
+        return;
+    }
+
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            int C = ciphertext[i] - 'A';
+            int P = (a_inv * (C - b + 26)) % 26;
+            printf("%c", P + 'A');
+        } else if (ciphertext[i] >= 'a' && ciphertext[i] <= 'z') {
+            int C = ciphertext[i] - 'a';
+            int P = (a_inv * (C - b + 26)) % 26;
+            printf("%c", P + 'a');
+        } else {
+            printf("%c", ciphertext[i]);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    char ciphertext[100];
+    printf("Enter the ciphertext: ");
+    fgets(ciphertext, sizeof(ciphertext), stdin);
+    ciphertext[strcspn(ciphertext, "\n")] = 0; // Remove newline
+
+    int a, b;
+    printf("Enter the value of a: ");
+    scanf("%d", &a);
+    printf("Enter the value of b: ");
+    scanf("%d", &b);
+
+    printf("Decrypted message: ");
+    affineDecrypt(ciphertext, a, b);
+
+    return 0;
+}
