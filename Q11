@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <math.h>
+
+// Function to calculate factorial of a number
+unsigned long long factorial(int n) {
+    if (n == 0) return 1;
+    unsigned long long result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+// Function to calculate logarithm base 2
+double log2(double n) {
+    return log(n) / log(2);
+}
+
+int main() {
+    // Number of letters used in the Playfair cipher matrix
+    int n = 25;
+
+    // Calculate 25!
+    unsigned long long total_keys = factorial(n);
+
+    // Calculate log base 2 of 25!
+    double log2_total_keys = log2((double)total_keys);
+
+    // Output the result
+    printf("Total possible keys (approximate power of 2): 2^%.2f\n", log2_total_keys);
+
+    // Number of symmetries in the matrix (120 permutations)
+    int symmetries = 120;
+
+    // Calculate number of effectively unique keys
+    unsigned long long unique_keys = total_keys / symmetries;
+
+    // Calculate log base 2 of unique keys
+    double log2_unique_keys = log2((double)unique_keys);
+
+    // Output the result
+    printf("Effectively unique keys (approximate power of 2): 2^%.2f\n", log2_unique_keys);
+
+    return 0;
+}
