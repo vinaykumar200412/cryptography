@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to find the modular inverse
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1) {
+            return x;
+        }
+    }
+    return -1;
+}
+
+// Function to decrypt a letter
+char decryptChar(char cipher, int a_inv, int b) {
+    int y = cipher - 'A';
+    int plain = (a_inv * (y - b + 26)) % 26;  // Ensure positive result
+    return 'A' + plain;
+}
+
+// Function to decrypt the entire message
+void decryptMessage(char *cipherText, int a, int b) {
+    int a_inv = modInverse(a, 26);
+    if (a_inv == -1) {
+        printf("Modular inverse does not exist for a=%d\n", a);
+        return;
+    }
+
+    printf("Decrypted message: ");
+    for (int i = 0; cipherText[i] != '\0'; i++) {
+        if (cipherText[i] >= 'A' && cipherText[i] <= 'Z') {
+            printf("%c", decryptChar(cipherText[i], a_inv, b));
+        } else {
+            printf("%c", cipherText[i]); // Non-alphabetic characters
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    // The most frequent letter in ciphertext is 'B' -> 'E' in plaintext
+    // The second most frequent letter in ciphertext is 'U' -> 'T' in plaintext
+    int E_plain = 4, B_cipher = 1;
+    int T_plain = 19, U_cipher = 20;
+
+    // Solving 15a ≡ 19 (mod 26)
+    int a = (19 * modInverse(15, 26)) % 26;  // a = 17
+    int b = (B_cipher - a * E_plain + 26) % 26;  // b = 23
+
+    printf("Decryption key: a = %d, b = %d\n", a, b);
+
+    // Example ciphertext
+    char cipherText[] = "BUUEBBUB";
+
+    decryptMessage(cipherText, a, b);
+
+    return 0;
+}
